@@ -50,8 +50,4 @@ Go to `http://localhost:5000`
 - Frontend calls this endpoint via `fetch()` and renders the results
 - All keyword matching logic is in `app.py` — no external APIs
 
-## CV blurb
-
-**Resume Analyzer** | Python, Flask, HTML/CSS/JS  
-Full-stack web app with a Python/Flask REST API backend and JavaScript frontend. Analyzes resume-job description fit using keyword extraction, frequency analysis, and rule-based scoring.
 

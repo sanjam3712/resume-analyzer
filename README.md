@@ -54,3 +54,4 @@ Go to `http://localhost:5000`
 
 **Resume Analyzer** | Python, Flask, HTML/CSS/JS  
 Full-stack web app with a Python/Flask REST API backend and JavaScript frontend. Analyzes resume-job description fit using keyword extraction, frequency analysis, and rule-based scoring.
+

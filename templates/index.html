@@ -108,9 +108,15 @@ textarea::placeholder { color: rgba(255,255,255,0.15); }
 footer { border-top: 1px solid var(--border); padding: 2.5rem 2rem; display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto; flex-wrap: wrap; gap: 1rem; }
 .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .footer-copy { font-size: 13px; color: var(--muted); }
+.alert { padding: 14px 18px; border-radius: var(--r); font-size: 13.5px; line-height: 1.6; margin-bottom: 12px; }
+.alert-warn { background: rgba(255,179,71,0.1); border: 1px solid rgba(255,179,71,0.25); color: #ffb347; }
+.alert-info { background: rgba(124,111,255,0.08); border: 1px solid rgba(124,111,255,0.2); color: #a89fff; }
+.alert strong { font-weight: 600; }
+.section-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 600; margin: 3px; text-transform: capitalize; }
+.section-ok { background: rgba(52,216,160,0.1); color: #34d8a0; border: 1px solid rgba(52,216,160,0.2); }
+.section-missing { background: rgba(255,107,157,0.08); color: #ff6b9d; border: 1px solid rgba(255,107,157,0.15); text-decoration: line-through; opacity: 0.7; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (max-width: 768px) {
   .nav-links { display: none; }
   nav { padding: 0 1.25rem; }
@@ -313,8 +319,17 @@ function renderResults(r) {
   const missingTags = r.missing.map(k => `<span class="tag tag-missing">${k}</span>`).join('') || '<span class="none-label">No gaps — great!</span>';
   const bonusSection = r.bonus.length ? `<div class="card" style="margin-bottom:16px"><div class="card-title">⭐ Bonus skills you bring</div><div class="tags">${r.bonus.map(k=>`<span class="tag tag-bonus">${k}</span>`).join('')}</div></div>` : '';
   const suggestions = r.suggestions.map(s => `<li>${s}</li>`).join('');
+  const alerts = [];
+  if (r.ats_warning) alerts.push(`<div class="alert alert-warn">⚠️ <strong>ATS Warning:</strong> Only ${r.word_count} words extracted from your PDF. It may be image-based or heavily formatted — use a plain text PDF for best results.</div>`);
+  if (r.seniority_mismatch) alerts.push(`<div class="alert alert-warn">⚠️ <strong>Seniority mismatch:</strong> This looks like a senior role but your resume reads as entry-level. Emphasise ownership, leadership, and impact.</div>`);
+  if (!r.has_numbers) alerts.push(`<div class="alert alert-info">💡 <strong>No quantified achievements found.</strong> Adding numbers (%, $, team size) can significantly boost your chances.</div>`);
+  const sectionIcons = { summary:'📝', experience:'💼', education:'🎓', skills:'🛠️', projects:'🚀' };
+  const sectionBadges = Object.entries(r.sections).map(([s, found]) =>
+    `<span class="section-badge ${found ? 'section-ok' : 'section-missing'}">${sectionIcons[s] || '•'} ${s}</span>`
+  ).join('');
   document.getElementById('results').innerHTML = `
     <div class="results-inner">
+      ${alerts.join('')}
       <div class="score-row">
         <div class="score-circle">
           <svg width="90" height="90" viewBox="0 0 90 90">
@@ -333,6 +348,10 @@ function renderResults(r) {
         <div class="metric"><div class="metric-val" style="color:${color}">${score}%</div><div class="metric-label">Match score</div></div>
         <div class="metric"><div class="metric-val" style="color:#34d8a0">${r.matched.length}</div><div class="metric-label">Keywords matched</div></div>
         <div class="metric"><div class="metric-val" style="color:#ff6b9d">${r.missing.length}</div><div class="metric-label">Keywords missing</div></div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">📋 Resume sections detected</div>
+        <div class="tags">${sectionBadges}</div>
       </div>
       <div class="cards-grid">
         <div class="card"><div class="card-title">✓ Matched keywords</div><div class="tags">${matchedTags}</div></div>
